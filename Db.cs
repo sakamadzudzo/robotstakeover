@@ -31,6 +31,11 @@ public class RobotstakeoverDB
 
     public static Survivor CreateSurvivor(Survivor survivor)
     {
+        // if (_survivors.MaxBy(x => x.Id) != null)
+        // {
+            int newId = _survivors.MaxBy(x => x.Id).Id + 1;
+        // }
+        survivor.Id = newId;
         _survivors.Add(survivor);
         return survivor;
     }
