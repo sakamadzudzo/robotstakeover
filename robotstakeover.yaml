@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: robotstakeover
+spec:
+  containers:
+  - image: robotstakeover
+    name: robotstakeover
+    ports:
+     - containerPort: 5208
