@@ -32,10 +32,18 @@ app.UseSwaggerUI(c =>
 });
 
 app.MapGet("/", () => "Hello World! -from the apocalypse");
+// Survivors endpoints
 app.MapGet("/getsurvivors", () => RobotstakeoverDB.GetSurvivors());
 app.MapGet("/getsurvivor/{id}", (int id) => RobotstakeoverDB.GetSurvivor(id));
 app.MapPost("/addsurvivor", (Survivor survivor) => RobotstakeoverDB.CreateSurvivor(survivor));
 app.MapPost("/updatesurvivor", (Survivor survivor) => RobotstakeoverDB.UpdateSurvivor(survivor));
 app.MapDelete("/removesurvivor/{id}", (int id) => RobotstakeoverDB.RemoveSurvivor(id));
+// Resources endpoints
+app.MapGet("/getresources", () => RobotstakeoverDB.GetResources());
+app.MapGet("/getresourcesbysurvivor/{survivorid}", (int survivorid) => RobotstakeoverDB.GetResourcesBySurvivor(survivorid));
+app.MapGet("/getresource/{id}", (int id) => RobotstakeoverDB.GetResource(id));
+app.MapPost("/addresource", (Resource resource) => RobotstakeoverDB.CreateResource(resource));
+app.MapPost("/updateresource", (Resource resource) => RobotstakeoverDB.UpdateResource(resource));
+app.MapDelete("/removeresource/{id}", (int id) => RobotstakeoverDB.RemoveResource(id));
 
 app.Run();
