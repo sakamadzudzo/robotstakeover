@@ -308,4 +308,29 @@ public class RobotstakeoverDB
         }
         return robot;
     }
+
+    public static Dictionary<string, double> GetInfectionsPercentages()
+    {
+        checkInfections();
+        Dictionary<string, double> infectionNumbers = new Dictionary<string, double>();
+
+        double totalSurvivors = _survivors.Count();
+        double infected = _survivors.FindAll(survivor => survivor.infected).ToList().Count();
+
+        infectionNumbers.Add("infected", ((infected / totalSurvivors) * 100));
+        infectionNumbers.Add("uninfected", (((totalSurvivors - infected) / totalSurvivors) * 100));
+        return infectionNumbers;
+    }
+
+    public static List<Survivor> GetInfectedSurvivors()
+    {
+        checkInfections();
+        return _survivors.FindAll(survivor => survivor.infected).ToList();
+    }
+
+    public static List<Survivor> GetUninfectedSurvivors()
+    {
+        checkInfections();
+        return _survivors.FindAll(survivor => !survivor.infected).ToList();
+    }
 }

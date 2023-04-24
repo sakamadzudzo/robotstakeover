@@ -56,5 +56,9 @@ app.MapGet("/getrobots", () => RobotstakeoverDB.GetRobots());
 app.MapGet("/getlandrobots", () => RobotstakeoverDB.GetLandRobots());
 app.MapGet("/getflyingrobots", () => RobotstakeoverDB.GetFlyingRobots());
 app.MapGet("/getrobot/{serialNumber}", (string serialNumber) => RobotstakeoverDB.GetRobot(serialNumber));
+// Infections endpoints
+app.MapGet("/getinfectionspercentages", () => RobotstakeoverDB.GetInfectionsPercentages());
+app.MapGet("/getinfectedsurvivors", () => RobotstakeoverDB.GetInfectedSurvivors());
+app.MapGet("/getuninfectedsurvivors", () => RobotstakeoverDB.GetUninfectedSurvivors());
 
 app.Run();
