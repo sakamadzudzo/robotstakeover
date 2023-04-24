@@ -36,5 +36,6 @@ app.MapGet("/getsurvivors", () => RobotstakeoverDB.GetSurvivors());
 app.MapGet("/getsurvivor/{id}", (int id) => RobotstakeoverDB.GetSurvivor(id));
 app.MapPost("/addsurvivor", (Survivor survivor) => RobotstakeoverDB.CreateSurvivor(survivor));
 app.MapPost("/updatesurvivor", (Survivor survivor) => RobotstakeoverDB.UpdateSurvivor(survivor));
+app.MapDelete("/removesurvivor/{id}", (int id) => RobotstakeoverDB.RemoveSurvivor(id));
 
 app.Run();

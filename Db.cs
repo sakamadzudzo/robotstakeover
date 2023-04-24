@@ -33,7 +33,7 @@ public class RobotstakeoverDB
     {
         // if (_survivors.MaxBy(x => x.Id) != null)
         // {
-            int newId = _survivors.MaxBy(x => x.Id)!.Id + 1;
+        int newId = _survivors.MaxBy(x => x.Id)!.Id + 1;
         // }
         survivor.Id = newId;
         _survivors.Add(survivor);
@@ -57,7 +57,8 @@ public class RobotstakeoverDB
             }
             return survivor;
         }).ToList();
-        if(found == false) {
+        if (found == false)
+        {
             throw new KeyNotFoundException();
         }
         return update;
@@ -65,6 +66,18 @@ public class RobotstakeoverDB
 
     public static void RemoveSurvivor(int id)
     {
+        Boolean found = false;
+        _survivors.ForEach(survivor =>
+        {
+            if (survivor.Id == id)
+            {
+                found = true;
+            }
+        });
+        if (found == false)
+        {
+            throw new KeyNotFoundException();
+        }
         _survivors = _survivors.FindAll(survivor => survivor.Id != id).ToList();
     }
 }
