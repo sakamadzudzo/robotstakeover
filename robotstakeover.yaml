@@ -4,7 +4,7 @@ metadata:
   name: robotstakeover
 spec:
   containers:
-  - image: robotstakeover
+  - image: sakamadzudzo/robotstakeover
     name: robotstakeover
     ports:
      - containerPort: 5208
