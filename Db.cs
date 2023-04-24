@@ -33,7 +33,7 @@ public class RobotstakeoverDB
     {
         // if (_survivors.MaxBy(x => x.Id) != null)
         // {
-            int newId = _survivors.MaxBy(x => x.Id).Id + 1;
+            int newId = _survivors.MaxBy(x => x.Id)!.Id + 1;
         // }
         survivor.Id = newId;
         _survivors.Add(survivor);
@@ -42,6 +42,7 @@ public class RobotstakeoverDB
 
     public static Survivor UpdateSurvivor(Survivor update)
     {
+        Boolean found = false;
         _survivors = _survivors.Select(survivor =>
         {
             if (survivor.Id == update.Id)
@@ -52,9 +53,13 @@ public class RobotstakeoverDB
                 survivor.DoB = update.DoB;
                 survivor.gender = update.gender;
                 survivor.location = update.location;
+                found = true;
             }
             return survivor;
         }).ToList();
+        if(found == false) {
+            throw new KeyNotFoundException();
+        }
         return update;
     }
 

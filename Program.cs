@@ -7,8 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Adding CORS functionality
 builder.Services.AddCors(options => { });
 
-// Adding converter for converting date as string to DateOnly and vice versa
-// builder.Services.AddDateOnlyTimeOnlyStringConverters();
 // custom DateOnly Json Converter
 builder.Services.Configure<JsonOptions>(options =>
 {
@@ -37,5 +35,6 @@ app.MapGet("/", () => "Hello World! -from the apocalypse");
 app.MapGet("/getsurvivors", () => RobotstakeoverDB.GetSurvivors());
 app.MapGet("/getsurvivor/{id}", (int id) => RobotstakeoverDB.GetSurvivor(id));
 app.MapPost("/addsurvivor", (Survivor survivor) => RobotstakeoverDB.CreateSurvivor(survivor));
+app.MapPost("/updatesurvivor", (Survivor survivor) => RobotstakeoverDB.UpdateSurvivor(survivor));
 
 app.Run();
