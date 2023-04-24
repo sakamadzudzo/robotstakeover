@@ -20,6 +20,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ROBOT Apocalypse API", Description = "Keeping track of all survivors, their resources, and the robots", Version = "v1" });
     c.MapType<DateOnly>(() => new OpenApiSchema { Type = "string" });
+    c.EnableAnnotations();
 });
 
 var app = builder.Build();
@@ -33,6 +34,8 @@ app.UseSwaggerUI(c =>
 
 // Check infections before starting app
 RobotstakeoverDB.checkInfections();
+// Connect to Robots CPU system and retrive list of robots
+RobotstakeoverDB.GetRobotsFromCPU();
 
 app.MapGet("/", () => "Hello World! -from the apocalypse");
 // Survivors endpoints
@@ -48,5 +51,10 @@ app.MapGet("/getresource/{id}", (int id) => RobotstakeoverDB.GetResource(id));
 app.MapPost("/addresource", (Resource resource) => RobotstakeoverDB.CreateResource(resource));
 app.MapPost("/updateresource", (Resource resource) => RobotstakeoverDB.UpdateResource(resource));
 app.MapDelete("/removeresource/{id}", (int id) => RobotstakeoverDB.RemoveResource(id));
+// Robots endpoints
+app.MapGet("/getrobots", () => RobotstakeoverDB.GetRobots());
+app.MapGet("/getlandrobots", () => RobotstakeoverDB.GetLandRobots());
+app.MapGet("/getflyingrobots", () => RobotstakeoverDB.GetFlyingRobots());
+app.MapGet("/getrobot/{serialNumber}", (string serialNumber) => RobotstakeoverDB.GetRobot(serialNumber));
 
 app.Run();

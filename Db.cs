@@ -1,3 +1,6 @@
+using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
+
 namespace robotstakeover.DB;
 
 public record Survivor
@@ -9,6 +12,7 @@ public record Survivor
     public DateOnly DoB { get; set; }
     public string? gender { get; set; }
     public string? location { get; set; }
+    [SwaggerSchema(ReadOnly = true)]
     public Boolean infected { get; set; } = false;
 }
 
@@ -26,7 +30,16 @@ public record Infection
     public int id { set; get; }
     public int reporter { get; set; }
     public int reportee { get; set; }
-    public DateOnly date { get; set; }
+    [SwaggerSchema(ReadOnly = true)]
+    public DateOnly date { get; set; } = new DateOnly();
+}
+
+public record Robot
+{
+    public string? model { get; set; }
+    public string? serialNumber { get; set; }
+    public DateTime manufacturedDate { get; set; }
+    public string? category { get; set; }
 }
 
 public class RobotstakeoverDB
@@ -249,5 +262,50 @@ public class RobotstakeoverDB
     public static List<Infection> GetInfectionsByReportee(int survivorId)
     {
         return _infections.FindAll(infection => infection.reportee == survivorId).ToList();
+    }
+
+    // Robots related stuff here
+    private static List<Robot> _robots = new List<Robot>();
+
+    public static async void GetRobotsFromCPU()
+    {
+        string path = "https://robotstakeover20210903110417.azurewebsites.net/robotcpu";
+        HttpClient client = new HttpClient();
+        HttpResponseMessage response = await client.GetAsync(path);
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            _robots = JsonConvert.DeserializeObject<List<Robot>>(responseContent)!;
+        }
+        _robots.OrderBy(robot => robot.manufacturedDate).ToList();
+    }
+
+    public static List<Robot> GetRobots()
+    {
+        checkInfections();
+        return _robots;
+    }
+
+    public static List<Robot> GetLandRobots()
+    {
+        checkInfections();
+        return _robots.FindAll(robot => robot.category!.ToLower() == "Land".ToLower()).ToList();
+    }
+
+    public static List<Robot> GetFlyingRobots()
+    {
+        checkInfections();
+        return _robots.FindAll(robot => robot.category!.ToLower() == "Flying".ToLower()).ToList();
+    }
+
+    public static Robot? GetRobot(string serialNumber)
+    {
+        checkInfections();
+        Robot robot = _robots.SingleOrDefault(robot => robot.serialNumber!.ToUpper() == serialNumber.ToUpper())!;
+        if (robot == null)
+        {
+            throw new KeyNotFoundException();
+        }
+        return robot;
     }
 }
