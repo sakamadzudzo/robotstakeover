@@ -31,6 +31,9 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "PizzaStore API V1");
 });
 
+// Check infections before starting app
+RobotstakeoverDB.checkInfections();
+
 app.MapGet("/", () => "Hello World! -from the apocalypse");
 // Survivors endpoints
 app.MapGet("/getsurvivors", () => RobotstakeoverDB.GetSurvivors());

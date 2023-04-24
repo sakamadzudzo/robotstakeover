@@ -9,6 +9,7 @@ public record Survivor
     public DateOnly DoB { get; set; }
     public string? gender { get; set; }
     public string? location { get; set; }
+    public Boolean infected { get; set; } = false;
 }
 
 public record Resource
@@ -20,21 +21,33 @@ public record Resource
     public int survivorId { get; set; }
 }
 
+public record Infection
+{
+    public int id { set; get; }
+    public int reporter { get; set; }
+    public int reportee { get; set; }
+    public DateOnly date { get; set; }
+}
+
 public class RobotstakeoverDB
 {
+    // Survivor related stuff here
     private static List<Survivor> _survivors = new List<Survivor>() {
         new Survivor{id=1,FirstName="Saka",OtherNames="Shingirai",LastName="Madzudzo",DoB=new DateOnly(1995,03,05),gender="male",location="-17.8251657, 31.03351"},
         new Survivor{id=2,FirstName="James",OtherNames="",LastName="Nollen",DoB=new DateOnly(1978,07,12),gender="male",location="-17.8251657, 31.03351"},
-        new Survivor{id=3,FirstName="Cathryn",OtherNames="Jane",LastName="Moyo",DoB=new DateOnly(1960,04,20),gender="female",location="-17.8251657, 31.03351"}
+        new Survivor{id=3,FirstName="Cathryn",OtherNames="Jane",LastName="Moyo",DoB=new DateOnly(1960,04,20),gender="female",location="-17.8251657, 31.03351"},
+        new Survivor{id=4,FirstName="Jeofrey",OtherNames="Malak",LastName="Callistro",DoB=new DateOnly(1958,07,25),gender="male",location="-17.8251657, 31.03351"}
     };
 
     public static List<Survivor> GetSurvivors()
     {
+        checkInfections();
         return _survivors;
     }
 
     public static Survivor? GetSurvivor(int id)
     {
+        checkInfections();
         Survivor survivor = _survivors.SingleOrDefault(survivor => survivor.id == id)!;
         if (survivor == null)
         {
@@ -45,6 +58,7 @@ public class RobotstakeoverDB
 
     public static Survivor CreateSurvivor(Survivor survivor)
     {
+        checkInfections();
         int newid = _survivors.MaxBy(x => x.id)!.id + 1;
         survivor.id = newid;
         _survivors.Add(survivor);
@@ -53,6 +67,7 @@ public class RobotstakeoverDB
 
     public static Survivor UpdateSurvivor(Survivor update)
     {
+        checkInfections();
         Boolean found = false;
         _survivors = _survivors.Select(survivor =>
         {
@@ -77,6 +92,7 @@ public class RobotstakeoverDB
 
     public static Survivor UpdateSurvivorLocation(int id, string location)
     {
+        checkInfections();
         Survivor survivorOld = _survivors.SingleOrDefault(survivor => survivor.id == id)!;
         if (survivorOld == null)
         {
@@ -101,6 +117,7 @@ public class RobotstakeoverDB
 
     public static void RemoveSurvivor(int id)
     {
+        checkInfections();
         Boolean found = false;
         _survivors.ForEach(survivor =>
         {
@@ -116,24 +133,33 @@ public class RobotstakeoverDB
         _survivors = _survivors.FindAll(survivor => survivor.id != id).ToList();
     }
 
+    // Resource related stuff here
     private static List<Resource> _resources = new List<Resource>() {
         new Resource{id=1,type="Water",unit="Liter",amount=5,survivorId=1},
         new Resource{id=2,type="Salt",unit="Kilogram",amount=0.2,survivorId=1},
-        new Resource{id=3,type="Apple",unit="Count",amount=50,survivorId=3}
+        new Resource{id=3,type="Apple",unit="Count",amount=50,survivorId=3},
+        new Resource{id=4,type="Beef",unit="Kilogram",amount=65,survivorId=4},
+        new Resource{id=4,type="Chicken",unit="Kilogram",amount=29,survivorId=4},
+        new Resource{id=4,type="Wheat",unit="Kilogram",amount=30,survivorId=4},
+        new Resource{id=4,type="Rice",unit="Kilogram",amount=20,survivorId=4},
+        new Resource{id=4,type="Water",unit="Liter",amount=131,survivorId=4},
     };
 
     public static List<Resource> GetResources()
     {
+        checkInfections();
         return _resources;
     }
 
     public static List<Resource> GetResourcesBySurvivor(int survivorId)
     {
+        checkInfections();
         return _resources.FindAll(resource => resource.survivorId == survivorId).ToList();
     }
 
     public static Resource? GetResource(int id)
     {
+        checkInfections();
         Resource resource = _resources.SingleOrDefault(resource => resource.id == id)!;
         if (resource == null)
         {
@@ -144,6 +170,7 @@ public class RobotstakeoverDB
 
     public static Resource CreateResource(Resource resource)
     {
+        checkInfections();
         int newid = _resources.MaxBy(x => x.id)!.id + 1;
         resource.id = newid;
         _resources.Add(resource);
@@ -152,6 +179,7 @@ public class RobotstakeoverDB
 
     public static Resource UpdateResource(Resource update)
     {
+        checkInfections();
         Boolean found = false;
         _resources = _resources.Select(resource =>
         {
@@ -174,6 +202,7 @@ public class RobotstakeoverDB
 
     public static void RemoveResource(int id)
     {
+        checkInfections();
         Boolean found = false;
         _resources.ForEach(resource =>
         {
@@ -187,5 +216,38 @@ public class RobotstakeoverDB
             throw new KeyNotFoundException();
         }
         _resources = _resources.FindAll(resource => resource.id != id).ToList();
+    }
+
+    // Infection related stuff here
+    public static List<Infection> _infections = new List<Infection>() {
+        new Infection{id=1,reporter=3,reportee=4,date=new DateOnly()},
+        new Infection{id=2,reporter=1,reportee=4,date=new DateOnly()},
+        new Infection{id=3,reporter=2,reportee=4,date=new DateOnly()},
+    };
+
+    public static void checkInfections()
+    {
+        _survivors = _survivors.Select(survivor =>
+            {
+                survivor.infected = isSurvivorInfected(survivor.id);
+                return survivor;
+            }).ToList();
+    }
+
+    public static Boolean isSurvivorInfected(int survivorId)
+    {
+        if (GetInfectionsByReportee(survivorId).Count >= 3)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static List<Infection> GetInfectionsByReportee(int survivorId)
+    {
+        return _infections.FindAll(infection => infection.reportee == survivorId).ToList();
     }
 }
